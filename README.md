@@ -18,6 +18,14 @@ A universal Minecraft Timer Mod for Challenges etc.
 - retime
 - retype
 
+## System Infos
+
+**Minecraft Verion:** Minecraft Java Fabric 1.21.5
+
+**Fabric Loader:** 0.16.14
+
+
+
 
 ## 🔗 Links
 [![portfolio](https://www.aaircrafter.online/linktreeicon.svg?logo=aaircrafter&logoColor=white)](https://www.aaircrafter.online/linktree)

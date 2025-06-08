@@ -20,7 +20,7 @@ A universal Minecraft Timer Mod for Challenges etc.
 
 
 ## 🔗 Links
-[![Linktree](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://www.aaircrafter.online/linktree)
+[![portfolio](https://www.aaircrafter.online/linktreeicon.svg?logo=aaircrafter&logoColor=white)](https://www.aaircrafter.online/linktree)
 [![discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://www.aaircrafter.online/discord)
 [![youtube](https://img.shields.io/badge/YouTube-%23FF0000.svg?logo=YouTube&logoColor=white)](https://www.youtube.com/@AAirCrafter)
 [![TikTok](https://img.shields.io/badge/TikTok-black?logo=tiktok&logoColor=white)](https://www.tiktok.com/@aaircrafter)

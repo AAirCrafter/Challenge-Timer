@@ -24,8 +24,8 @@ A universal Minecraft Timer Mod for Challenges etc.
 [![discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://www.aaircrafter.online/discord)
 [![youtube](https://img.shields.io/badge/YouTube-%23FF0000.svg?logo=YouTube&logoColor=white)](https://www.youtube.com/@AAirCrafter)
 [![TikTok](https://img.shields.io/badge/TikTok-black?logo=tiktok&logoColor=white)](https://www.tiktok.com/@aaircrafter)
-[![Modrinth](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://modrinth.com/user/AAirCrafter)
-[![PlanetMC](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://www.planetminecraft.com/member/aaircrafter/)
+[![Modrinth](https://img.shields.io/badge/Modrinth-5da545?logo=modrinth&logoColor=white)](https://modrinth.com/user/AAirCrafter)
+[![PlanetMC](https://img.shields.io/badge/PlanetMinecraft-2d6f90?logo=internet-explorer&logoColor=white)](https://www.planetminecraft.com/member/aaircrafter/)
 
 ## Authors
 

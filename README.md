@@ -60,6 +60,7 @@ How to set default Timer Color
 How to set finished-text (text shown after timer over)
 ```
   /timer settings finished_text <text>
+
   Keywords:
   {name} = name of current timer
 ```

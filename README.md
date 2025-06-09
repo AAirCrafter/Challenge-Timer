@@ -26,7 +26,7 @@ How to add Countdown
 ```
   /timer add <Timername> <time>
 
-  <time> given like ```2d6h20m13s```
+  <time> given like "2d6h20m13s"
 
   Keywords: 
   'd' : days 

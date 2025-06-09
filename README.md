@@ -57,6 +57,13 @@ How to set default Timer Color
   /timer settings default_color <color(name or hex)>
 ```
 
+How to set finished-text (text shown after timer over)
+```
+  /timer settings finished_text <text>
+  Keywords:
+  {name} = name of current timer
+```
+
 How to pause/unpause
 ```
   /timer un(pause)
@@ -69,7 +76,7 @@ Keywords:
 'd' : days 
 'h' : hours 
 'm' : minutes 
-'s' : seconds 
+'s' : seconds
 ```
 
 

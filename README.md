@@ -27,35 +27,52 @@ How to add Countdown
   /timer add <Timername> <time>
 ```
 
+<time> given like ```2d6h20m13s```
+
+Keywords: 
+```
+'d' : days 
+'h' : hours 
+'m' : minutes 
+'s' : seconds
+```
+
+
 How to add Stoppwatch
 ```
   /timer add <name> <time> Countup
 ```
+
 
 How to remove Timer
 ```
   /timer remove <name>
 ```
 
+
 How to set active Timer
 ```
   /timer set <name>
 ```
+
 
 How to set Timer Color
 ```
   /timer set <name> color <color(name or hex)>
 ```
 
+
 How to set Pre/Suffix
 ```
   /timer settings Prefix/Suffix <prefix/suffix>
 ```
 
+
 How to set default Timer Color
 ```
   /timer settings default_color <color(name or hex)>
 ```
+
 
 How to set finished-text (text shown after timer over)
 ```
@@ -65,20 +82,14 @@ How to set finished-text (text shown after timer over)
   {name} = name of current timer
 ```
 
+
 How to pause/unpause
 ```
   /timer un(pause)
 ```
 
-<test> given like ```2d6h20m13s```
 
-Keywords: 
-```
-'d' : days 
-'h' : hours 
-'m' : minutes 
-'s' : seconds
-```
+
 
 
 ## System Infos

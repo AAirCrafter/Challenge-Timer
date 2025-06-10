@@ -17,6 +17,8 @@ A universal Minecraft Timer Mod for Challenges etc.
 - set Pre- & Suffix
 - retime
 - retype
+- set finished text
+- format text (bold,underlined,..)
 
   
 

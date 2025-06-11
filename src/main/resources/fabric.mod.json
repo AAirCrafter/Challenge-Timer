@@ -1,0 +1,47 @@
+{
+	"schemaVersion": 1,
+	"id": "timer",
+	"version": "1.0.4",
+	"name": "Timer",
+	"description": "An universal Challenge Timer Mod",
+	"links": {
+		"Discord": "https://www.aaircrafter.online/discord",
+		"Github": "https://github.com/AAirCrafter",
+		"Modrinth": "https://modrinth.com/user/AAirCrafter",
+		"PlanetMC": "https://www.planetminecraft.com/member/aaircrafter/"
+	},
+	"authors": [
+		"AAirCrafter"
+	],
+	"contact": {
+		"homepage": "https:www.aaircrafter.online",
+		"issues": "https://github.com/AAirCrafter/Challenge-Timer/issues"
+	},
+	"license": "All rights reserved",
+	"icon": "assets/timer/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"air.dev.Timer"
+		],
+		"client": [
+			"air.dev.TimerClient"
+		]
+	},
+	"mixins": [
+		"timer.mixins.json",
+		{
+			"config": "timer.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

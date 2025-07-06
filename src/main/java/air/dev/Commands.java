@@ -7,16 +7,14 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 public class Commands {
 
@@ -26,31 +24,29 @@ public class Commands {
     public static void registerCommands() {
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
             dispatcher.register(CommandManager.literal("timer")
-                    .executes(context -> {
-                        timer(context);
-                        return 1;
-                    })
+                    .requires(source -> source.hasPermissionLevel(3))
+                    .executes(Commands::timer)
                     .then(CommandManager.literal("add")
                             .then(CommandManager.argument("name", StringArgumentType.string())
-                                    .then(CommandManager.argument("time", StringArgumentType.string())
-                                            .executes(Commands::addTimer)
-                                            .then(CommandManager.literal("Countup")
-                                                    .executes(Commands::addStopWatch))
-                                            .then(CommandManager.literal("Countdown")
-                                                    .executes(Commands::addTimer))
+                                    .then(CommandManager.literal("Countup")
+                                            .executes(Commands::addStopWatch))
+                                    .then(CommandManager.literal("Countdown")
+                                            .then(CommandManager.argument("time", StringArgumentType.string())
+                                                    .executes(Commands::addTimer)
+                                            )
                                     )
                             )
                     )
                     .then(CommandManager.literal("remove")
                             .then(CommandManager.argument("name", StringArgumentType.word())
-                                            .suggests((context,builder) -> {
+                                    .suggests((context,builder) -> {
 
-                                                for (TimerData timer : TimerStorage.getTimers()) {
-                                                    builder.suggest(timer.name);
-                                                }
-                                                return builder.buildFuture();
-                                            })
-                                            .executes(Commands::removeTimer)
+                                        for (TimerData timer : TimerStorage.getTimers()) {
+                                            builder.suggest(timer.name);
+                                        }
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(Commands::removeTimer)
                             )
                     )
                     .then(CommandManager.literal("en/disable")
@@ -60,16 +56,6 @@ public class Commands {
                                     context.getSource().sendFeedback(() -> Text.literal("Timer's enabled!").formatted(Formatting.GOLD), true);
                                 } else {
                                     context.getSource().sendFeedback(() -> Text.literal("Timer's disabled!").formatted(Formatting.GOLD), true);
-                                }
-                                return 1;
-                            }))
-                    .then(CommandManager.literal("togglePause")
-                            .executes(context -> {
-                                toggleTimerPause = !toggleTimerPause;
-                                if (toggleTimerPause) {
-                                    context.getSource().sendFeedback(() -> Text.literal("Timer's unpaused!").formatted(Formatting.GOLD), true);
-                                } else {
-                                    context.getSource().sendFeedback(() -> Text.literal("Timer's paused!").formatted(Formatting.GOLD), true);
                                 }
                                 return 1;
                             }))
@@ -114,7 +100,6 @@ public class Commands {
                                             .executes(Commands::setFinishedText))
                             )
                     )
-
                     .then(CommandManager.literal("set")
                             .then(CommandManager.argument("name",StringArgumentType.word())
                                     .executes(Commands::setActiveTimer)
@@ -126,14 +111,14 @@ public class Commands {
                                         return builder.buildFuture();
                                     })
                                     .then(CommandManager.literal("color")
-                                        .then(CommandManager.argument("color",StringArgumentType.string())
-                                                .suggests((context,builder) -> {
-                                                   for (String color : Types.getColorNames()) {
-                                                        builder.suggest(color);
-                                                    }
-                                                    return builder.buildFuture();
-                                                })
-                                                .executes(Commands::setColor))
+                                            .then(CommandManager.argument("color",StringArgumentType.string())
+                                                    .suggests((context,builder) -> {
+                                                        for (String color : Types.getColorNames()) {
+                                                            builder.suggest(color);
+                                                        }
+                                                        return builder.buildFuture();
+                                                    })
+                                                    .executes(Commands::setColor))
 
 
                                     )
@@ -161,9 +146,101 @@ public class Commands {
                                     )
                             )
                     )
+                    .then(CommandManager.literal("pause")
+                            .executes(context -> {
+                                toggleTimerPause = !toggleTimerPause;
+                                if (toggleTimerPause) {
+                                    context.getSource().sendFeedback(() -> Text.literal("Timer's unpaused!").formatted(Formatting.GOLD), true);
+                                } else {
+                                    context.getSource().sendFeedback(() -> Text.literal("Timer's paused!").formatted(Formatting.GOLD), true);
+                                }
+                                return 1;
+                            }))
+                    .then(CommandManager.literal("reset")
+                            .then(CommandManager.argument("name",StringArgumentType.string())
+                                    .suggests((context,builder) -> {
+
+                                        for (TimerData timer : TimerStorage.getTimers()) {
+                                            builder.suggest(timer.name);
+                                        }
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(Commands::resetTimer)))
+                    .then(CommandManager.literal("start")
+                            .then(CommandManager.argument("name",StringArgumentType.string())
+                                    .suggests((conext, builder) -> {
+                                        for (TimerData timer : TimerStorage.getTimers()) {
+                                            builder.suggest(timer.name);
+                                        }
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(Commands::startTimer)))
+                    .then(CommandManager.literal("help")
+                            .executes(Commands::help)
+                    )
             );
         }));
     }
+
+
+
+
+    private static int help(CommandContext<ServerCommandSource> context) {
+        Text header = Text.literal("Quick Tutorial\n").formatted(Formatting.BOLD, Formatting.UNDERLINE).styled(style -> style.withColor(0x58C7FF));
+
+        Text tutorial = Text.empty()
+                .append(Text.literal("\nHow to add a (fe. 3 hour) Timer:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer add exampletimer Countdown 3h\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to start the Timer:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer start exampletimer\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to change the shown timer:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer set othertimer\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to change the timer's prefix:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer settings prefix '>> '\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶▶ the prefix&suffix color is the default color\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to set the color of a timer:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer set exampletimer color aqua\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶▶ you can use hex codes by typing the code in quotation marks fe: '#FFFFFF'\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to set the time of a timer:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer set exampletimer time 1h30m\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶▶ time is given like '1d6h20m12s'. timekeywords like h = hours, etc.\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to modify the text shown when the timer is over:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer settings finished_text '{name} is over stop doing sth'\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶▶ use {name} to use the timer's name in the finished_text\n").formatted(Formatting.GRAY))
+                ;
+
+        Text link = Text.literal("\n▶ Click here for more Information")
+                .formatted(Formatting.GOLD)
+                .styled(style -> style.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://github.com/AAirCrafter/Challenge-Timer"))));
+
+        context.getSource().sendMessage(Text.empty().append(header).append(tutorial).append(link));
+        return 1;
+    }
+
+
+    private static int startTimer(CommandContext<ServerCommandSource> context) {
+        String name = StringArgumentType.getString(context, "name");
+        MinecraftServer server = context.getSource().getServer();
+        TimerStorage.startTimer(server,name);
+        return 1;
+    }
+
+
+    private static int resetTimer(CommandContext<ServerCommandSource> context) {
+        String name = StringArgumentType.getString(context,"name");
+        MinecraftServer server = context.getSource().getServer();
+        boolean exists = TimerStorage.getTimers().stream()
+                .anyMatch(timer -> timer.name.equals(name));
+
+        if (!exists) {
+            context.getSource().sendFeedback(() -> Text.literal("Timer not found!").formatted(Formatting.RED),false);
+        } else {
+            TimerStorage.resetTimer(server,name);
+            context.getSource().sendFeedback(() -> Text.literal("Reset "+name).formatted(Formatting.GREEN),false);
+        }
+        return 1;
+    }
+
 
     private static int setFormattings(CommandContext<ServerCommandSource> context) {
         String name = StringArgumentType.getString(context,"name");
@@ -186,6 +263,7 @@ public class Commands {
         return 1;
     }
 
+
     private static int setFinishedText(CommandContext<ServerCommandSource> context) {
         String text = StringArgumentType.getString(context,"value");
         MinecraftServer server = context.getSource().getServer();
@@ -194,6 +272,7 @@ public class Commands {
         return 1;
     }
 
+
     private static int setActiveTimer(CommandContext<ServerCommandSource> context) {
         String name = StringArgumentType.getString(context,"name");
         MinecraftServer server = context.getSource().getServer();
@@ -201,15 +280,27 @@ public class Commands {
         boolean exists = TimerStorage.getTimers().stream()
                 .anyMatch(timer -> timer.name.equals(name));
 
+        TimerData timernow = null;
+        for (TimerData timer : TimerStorage.getTimers()) {
+            if (timer.active) {
+                timernow = timer;
+            }
+        }
+
+
         if (!exists) {
             context.getSource().sendFeedback(() -> Text.literal("Timer not found!").formatted(Formatting.RED),false);
         } else {
+            if (name.equals(timernow.name)) {
+                timernow.active = false;
+            }
             TimerStorage.setActiveTimer(server,name);
             context.getSource().sendFeedback(() -> Text.literal("Set active Timer: "+name).formatted(Formatting.GREEN),false);
         }
 
         return 1;
     }
+
 
     private static int setupType(CommandContext<ServerCommandSource> context) {
         String name = StringArgumentType.getString(context,"name");
@@ -230,6 +321,7 @@ public class Commands {
         }
         return 1;
     }
+
 
     private static int setdownType(CommandContext<ServerCommandSource> context) {
         String name = StringArgumentType.getString(context,"name");
@@ -260,8 +352,6 @@ public class Commands {
 
         boolean exists = TimerStorage.getTimers().stream()
                 .anyMatch(timer -> timer.name.equals(name));
-
-
 
         if (!exists) {
             context.getSource().sendFeedback(() -> Text.literal("Timer not found!").formatted(Formatting.RED), false);
@@ -310,9 +400,6 @@ public class Commands {
     }
 
 
-
-
-
     private static int setDefaultColor(CommandContext<ServerCommandSource> context) {
         String color = StringArgumentType.getString(context, "color").toLowerCase();
         Map<String, String> colorMap = Types.getColorMap();
@@ -359,10 +446,6 @@ public class Commands {
     }
 
 
-
-
-
-
     private static int setTime(CommandContext<ServerCommandSource> context) {
         String name = StringArgumentType.getString(context,"name");
         String time = StringArgumentType.getString(context,"time");
@@ -404,6 +487,7 @@ public class Commands {
 
     }
 
+
     private static int addTimer(CommandContext<ServerCommandSource> context) {
         String name = StringArgumentType.getString(context, "name");
         String time = StringArgumentType.getString(context, "time");
@@ -443,12 +527,12 @@ public class Commands {
     }
 
 
-    private static void timer(CommandContext<ServerCommandSource> context) {
+    private static int timer(CommandContext<ServerCommandSource> context) {
         List<TimerData> timers = TimerStorage.getTimers();
 
         if (timers.isEmpty()) {
             context.getSource().sendFeedback(() -> Text.literal("No Timers available!").formatted(Formatting.RED), false);
-            return;
+            return 1;
         }
 
         Text existingtimerstxt = Text.literal("Existing Timers:\n\n").formatted(Formatting.UNDERLINE).formatted(Formatting.GRAY).formatted(Formatting.BOLD);
@@ -462,12 +546,15 @@ public class Commands {
         Text existingtimers = Text.literal(timerlist).formatted(Formatting.WHITE);
 
         Text combined = Text.empty()
-                        .append(existingtimerstxt)
-                                .append(existingtimers);
+                .append(existingtimerstxt)
+                .append(existingtimers);
 
 
 
 
         context.getSource().sendFeedback(() ->combined, false);
+        return 1;
     }
+
+
 }

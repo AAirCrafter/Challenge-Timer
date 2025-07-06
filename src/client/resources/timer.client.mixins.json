@@ -3,7 +3,7 @@
 	"package": "air.dev.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ExampleClientMixin"
+		"TimerClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

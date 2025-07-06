@@ -3,6 +3,7 @@ package air.dev;
 public class TimerData {
     public String name;
     public int time;
+    public int defaultTime;
     public String color;
     public String type;
     public Boolean active;
@@ -17,6 +18,7 @@ public class TimerData {
     public TimerData(String name, int time, String color,String type, Boolean active) {
         this.name = name;
         this.time = time;
+        this.defaultTime = time;
         this.color = color;
         this.type = type;
         this.active = active;

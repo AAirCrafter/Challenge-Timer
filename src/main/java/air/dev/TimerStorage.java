@@ -54,9 +54,22 @@ public class TimerStorage {
 
 
     public static void addTimer(MinecraftServer server, String name, String type, int time) {
-        for (TimerData timer : timers) timer.active = false;
-        timers.add(new TimerData(name, time, settings.defaultColor, type, true));
+        timers.add(new TimerData(name, time, settings.defaultColor, type, false));
         save(server);
+    }
+
+    public static void startTimer(MinecraftServer server, String name) {
+        for (TimerData timer : timers) {
+            timer.active = timer.name.equals(name);
+        }
+    }
+
+    public static void resetTimer(MinecraftServer server, String name) {
+        for (TimerData timer : timers) {
+            if (timer.name.equals(name)) {
+                timer.time = timer.defaultTime;
+            }
+        }
     }
 
     public static void setActiveTimer(MinecraftServer server, String name) {
@@ -74,6 +87,7 @@ public class TimerStorage {
         for (TimerData timer : timers) {
             if (timer.name.equals(name)) {
                 timer.time = time;
+                timer.defaultTime = time;
                 save(server);
                 return;
             }
@@ -138,6 +152,7 @@ public class TimerStorage {
         try {
             File file = getFile(server);
             if (file.exists()) {
+
                 FileReader reader = new FileReader(file);
                 JsonObject obj = GSON.fromJson(reader, JsonObject.class);
 

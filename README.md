@@ -20,7 +20,7 @@ A universal Minecraft Timer Mod for Challenges etc.
 
 ## Upcoming:
 - more advanced formatting options
-- color gradient
+- color gradient (animated)
 - assign timers to players
 
   

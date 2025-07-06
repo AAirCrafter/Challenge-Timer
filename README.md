@@ -4,21 +4,24 @@
 A universal Minecraft Timer Mod for Challenges etc. 
 
 
-
-
-
 ## Features
 
 - Countdown
-- Stopwatch
+- Countup (Stopwatch)
 - multiple Timers supported
 - Colors (names + hex-codes)
 - advanced Time Indication
 - set Pre- & Suffix
 - retime
 - retype
-- set finished text
+- customize finished text (shown when the timer is over)
 - format text (bold,underlined,..)
+- pause timers
+
+## Upcoming:
+- more advanced formatting options
+- color gradient
+- assign timers to players
 
   
 
@@ -26,7 +29,7 @@ A universal Minecraft Timer Mod for Challenges etc.
 
 How to add Countdown
 ```
-  /timer add <Timername> <time>
+  /timer add Countdown <Timername> <time>
 
   <time> given like "2d6h20m13s"
 
@@ -39,11 +42,21 @@ How to add Countdown
 ```
 
 
-
-
 How to add Stoppwatch
 ```
-  /timer add <name> <time> Countup
+  /timer add Countup <name> <time> Countup
+```
+
+
+How to start the Timer
+```
+  /timer start <name>
+```
+
+
+How to reset the Timer
+```
+  /timer reset <name>
 ```
 
 
@@ -53,7 +66,7 @@ How to remove Timer
 ```
 
 
-How to set active Timer
+How to change the shown Timer
 ```
   /timer set <name>
 ```
@@ -65,9 +78,17 @@ How to set Timer Color
 ```
 
 
+How to set Timer Time
+```
+  /timer set <name> time <time>
+```
+
+
 How to set Pre/Suffix
 ```
-  /timer settings Prefix/Suffix <prefix/suffix>
+  /timer settings prefix/suffix <prefix/suffix>
+
+  ! the pre/suffix color is the default_color
 ```
 
 
@@ -88,9 +109,14 @@ How to set finished-text (text shown after timer over)
 
 How to pause/unpause
 ```
-  /timer un(pause)
+  /timer pause 
 ```
 
+
+How to en/disable timers
+```
+  /timer en/disable
+```
 
 
 
@@ -99,7 +125,7 @@ How to pause/unpause
 
 **Minecraft Verion:** Minecraft Java Fabric 1.21.5
 
-**Fabric Loader:** 0.16.14
+**Fabric Loader:** 0.16.14 (usually preset)
 
 
 

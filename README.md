@@ -10,20 +10,21 @@ A universal Minecraft Timer Mod for Challenges etc.
 - Countup (Stopwatch)
 - multiple Timers supported
 - Colors (names + hex-codes)
+- Color Gradients (static & animated)
+- customize animationtime + direction
 - advanced Time Indication
 - set Pre- & Suffix
 - retime
-- retype
+- retype (count up/down)
 - customize finished text (shown when the timer is over)
 - format text (bold,underlined,..)
 - pause timers
 
 ## Upcoming:
 - more advanced formatting options
-- color gradient (animated)
 - assign timers to players
 
-  
+
 
 ## Usage
 
@@ -75,6 +76,11 @@ How to change the shown Timer
 How to set Timer Color
 ```
   /timer set <name> color <color(name or hex)>
+```
+
+How to use an animated Gradient
+```
+    /timer set <name> color gradient <hex> <hex> animated
 ```
 
 

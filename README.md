@@ -23,7 +23,7 @@ A universal Minecraft Timer Mod for Challenges etc.
 ## Upcoming:
 - more advanced formatting options
 - assign timers to players
-
+- more colors in gradients possible
 
 
 ## Usage

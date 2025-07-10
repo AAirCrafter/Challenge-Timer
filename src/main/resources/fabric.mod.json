@@ -1,10 +1,10 @@
 {
 	"schemaVersion": 1,
 	"id": "timer",
-	"version": "1.2.0",
+	"version": "1.2.2",
 	"name": "Timer",
-	"description": "An universal Challenge Timer Mod",
-	"links": {
+	"description": "an advanced countdown/stopwatch mod for challenges etc with all kinds of features such as animated gradients",
+	"custom": {
 		"Discord": "https://www.aaircrafter.online/discord",
 		"Github": "https://github.com/AAirCrafter",
 		"Modrinth": "https://modrinth.com/user/AAirCrafter",

@@ -416,7 +416,7 @@ public class Commands {
     private static int setColor(CommandContext<ServerCommandSource> context) {
         String color = StringArgumentType.getString(context, "color").toLowerCase();
         String name = StringArgumentType.getString(context, "name");
-        Map<String, String> colorMap = Types.getColorMap();
+        Map<String, Formatting> colorMap = Types.getColorMap();
         MinecraftServer server = context.getSource().getServer();
 
         boolean exists = TimerStorage.getTimers().stream()
@@ -460,8 +460,9 @@ public class Commands {
             return 0;
         }
 
+
         if (colorset) {
-            Text fullText = Text.literal("Recolored ").append(nameText).append(Text.literal("§r"));
+            Text fullText = Text.literal("Recolored ").append(nameText);
             context.getSource().sendFeedback(() -> fullText, false);
         }
 
@@ -589,7 +590,7 @@ public class Commands {
 
     private static int setDefaultColor(CommandContext<ServerCommandSource> context) {
         String color = StringArgumentType.getString(context, "color").toLowerCase();
-        Map<String, String> colorMap = Types.getColorMap();
+        Map<String, Formatting> colorMap = Types.getColorMap();
         MinecraftServer server = context.getSource().getServer();
 
         boolean isColorValid = false;
@@ -625,7 +626,7 @@ public class Commands {
         Text nameText = Text.literal(color).setStyle(Style.EMPTY.withColor(textColor));
 
         if (colorset) {
-            Text fullText = Text.literal("Recolored ").append(nameText).append(Text.literal("§r"));
+            Text fullText = Text.literal("Recolored ").append(nameText);
             context.getSource().sendFeedback(() -> fullText, false);
         }
 

@@ -1,7 +1,8 @@
 
 # Challenge Timer
 
-A universal Minecraft Timer Mod for Challenges etc. 
+An advanced Minecraft Timer Mod for Challenges etc.                                           
+Tutorial: https://youtu.be/aHcGYtDmxuk
 
 
 ## Features
@@ -19,6 +20,7 @@ A universal Minecraft Timer Mod for Challenges etc.
 - customize finished text (shown when the timer is over)
 - format text (bold,underlined,..)
 - pause timers
+- customize pause text
 
 ## Upcoming:
 - more advanced formatting options
@@ -103,10 +105,17 @@ How to set default Timer Color
   /timer settings default_color <color(name or hex)>
 ```
 
+How to let Pre/Suffix inherit from Timer Formattings
+```
+  /timer settings defaultColor useTimerFormattings
+
+  ! fe gradients and formattings like bold/underlined
+```
+
 
 How to set finished-text (text shown after timer over)
 ```
-  /timer settings finished_text <text>
+  /timer settings finishedText <text>
 
   Keywords:
   {name} = name of current timer
@@ -116,6 +125,15 @@ How to set finished-text (text shown after timer over)
 How to pause/unpause
 ```
   /timer pause 
+```
+
+How to set paused-text (text shown after timer over)
+```
+  /timer settings pausedText <text>
+
+  Keywords:
+  {name} = name of current timer
+  {time} = time of current timer
 ```
 
 

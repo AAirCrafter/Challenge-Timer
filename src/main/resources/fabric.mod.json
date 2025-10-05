@@ -1,14 +1,20 @@
 {
 	"schemaVersion": 1,
 	"id": "timer",
-	"version": "1.2.2",
+	"version": "1.2.5",
 	"name": "Timer",
 	"description": "an advanced countdown/stopwatch mod for challenges etc with all kinds of features such as animated gradients",
 	"custom": {
-		"Discord": "https://www.aaircrafter.online/discord",
-		"Github": "https://github.com/AAirCrafter",
-		"Modrinth": "https://modrinth.com/user/AAirCrafter",
-		"PlanetMC": "https://www.planetminecraft.com/member/aaircrafter/"
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://www.aaircrafter.online/discord\"",
+				"modmenu.source": "https://github.com/AAirCrafter/Challenge-Timer",
+				"modmenu.modrinth": "https://modrinth.com/mod/challengetimer",
+				"PlanetMC": "https://www.planetminecraft.com/mod/challenge-timer-fabric/",
+				"modmenu.youtube": "https://www.youtube.com/@aaircrafter"
+			},
+			"update_checker": true
+		}
 	},
 	"authors": [
 		"AAirCrafter"

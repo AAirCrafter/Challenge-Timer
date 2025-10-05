@@ -38,7 +38,6 @@ public class TimerData {
         this.underlined = false;
         this.strikedthrough = false;
         this.obfuscated = false;
-
     }
 
     @Override

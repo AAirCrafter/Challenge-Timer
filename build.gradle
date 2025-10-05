@@ -19,17 +19,22 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
-
 }
 
+repositories {
+	maven { url "https://maven.terraformersmc.com/releases/" } // Für ModMenu
+	maven { url "https://maven.fabricmc.net/" }              // Für Fabric Loader, API etc.
+	mavenCentral()
+}
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+
+	// ModMenu in aktueller stabiler Version
+	modRuntimeOnly "com.terraformersmc:modmenu:14.0.0-rc.2"
 }
 
 processResources {
@@ -55,7 +60,7 @@ jar {
 	inputs.property "archivesName", project.base.archivesName
 
 	from("LICENSE") {
-		rename { "${it}_${inputs.properties.archivesName}"}
+		rename { "${it}_${inputs.properties.archivesName}" }
 	}
 }
 
@@ -66,5 +71,6 @@ publishing {
 			from components.java
 		}
 	}
-
 }
+
+// pluginManagement in settings.gradle (nicht in build.gradle!)

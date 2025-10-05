@@ -15,9 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TimerStorage {
-    private static final Gson GSON = new Gson();
-    private static final Type LIST_TYPE = new TypeToken<List<TimerData>>(){}.getType();
-    private static final String FILE_NAME = "timers.json";
+    private static final Gson gson = new Gson();
+    private static final Type listType = new TypeToken<List<TimerData>>(){}.getType();
+    private static final String fileName = "timers.json";
 
     private static List<TimerData> timers = new ArrayList<>();
     private static TimerSettings settings = new TimerSettings(); // NEU
@@ -33,6 +33,36 @@ public class TimerStorage {
     public static void setAnimationTime(MinecraftServer server, int time) {
         settings.animationTime = time;
         save(server);
+    }
+
+    public static boolean toggleUseTimerFormattings(MinecraftServer server) {
+        settings.useTimerFormattings = !settings.useTimerFormattings;
+        save(server);
+        return settings.useTimerFormattings;
+    }
+
+    public static boolean toggleTimersEnabled(MinecraftServer server) {
+        settings.timersEnabled = !settings.timersEnabled;
+        save(server);
+        return settings.timersEnabled;
+    }
+
+    public static boolean areTimersEnabled() {
+        return settings.timersEnabled;
+    }
+
+    public static boolean toggleTimersPaused(MinecraftServer server) {
+        settings.timersPaused = !settings.timersPaused;
+        save(server);
+        return settings.timersPaused;
+    }
+
+    public static boolean areTimersPaused() {
+        return settings.timersPaused;
+    }
+
+    public static boolean isTimerFormattingsUsed() {
+        return settings.useTimerFormattings;
     }
 
     public static void setDefaultPrefix(MinecraftServer server, String prefix) {
@@ -51,12 +81,15 @@ public class TimerStorage {
         return true;
     }
 
-    public static void setFinishedMessage(MinecraftServer server, String message) {
-        settings.finishedText = message;
+    public static void setFinishedText(MinecraftServer server, String text) {
+        settings.finishedText = text;
         save(server);
     }
 
-
+    public static void setPausedText(MinecraftServer server, String text) {
+        settings.pausedText = text;
+        save(server);
+    }
 
     public static void addTimer(MinecraftServer server, String name, String type, int time) {
         timers.add(new TimerData(name, time, settings.defaultColor, type, false));
@@ -76,8 +109,6 @@ public class TimerStorage {
             }
         }
     }
-
-
 
     public static void setActiveTimer(MinecraftServer server, String name) {
         for (TimerData timer : timers) timer.active = false;
@@ -102,7 +133,7 @@ public class TimerStorage {
     }
 
     public static boolean setFormattings(MinecraftServer server, String name, String formatting) {
-        if (Types.getFormattingMap().containsKey(formatting)) {
+        if (Renderer.getFormattingMap().containsKey(formatting)) {
             for (TimerData timer : timers) {
                 if (timer.name.equals(name)) {
                     boolean wasActive = switch (formatting) {
@@ -120,26 +151,6 @@ public class TimerStorage {
         }
         return false;
     }
-
-    /*
-    public static void setPrefix(MinecraftServer server, String name, String prefix) {
-        for (TimerData timer : timers) {
-            if (timer.name.equals(name)) {
-                timer.prefix = prefix;
-                save(server);
-            }
-        }
-    }
-
-    public static void setSuffix(MinecraftServer server, String name, String prefix) {
-        for (TimerData timer : timers) {
-            if (timer.name.equals(name)) {
-                timer.prefix = prefix;
-                save(server);
-            }
-        }
-    }
-     */
 
     public static boolean setType(MinecraftServer server, String name, String type) {
         for (TimerData timer : timers) {
@@ -176,15 +187,16 @@ public class TimerStorage {
     }
 
     public static void load(MinecraftServer server) {
+        timers.clear();
         try {
             File file = getFile(server);
             if (file.exists()) {
 
                 FileReader reader = new FileReader(file);
-                JsonObject obj = GSON.fromJson(reader, JsonObject.class);
+                JsonObject obj = gson.fromJson(reader, JsonObject.class);
 
-                timers = GSON.fromJson(obj.get("timers"), LIST_TYPE);
-                settings = GSON.fromJson(obj.get("settings"), TimerSettings.class);
+                timers = gson.fromJson(obj.get("timers"), listType);
+                settings = gson.fromJson(obj.get("settings"), TimerSettings.class);
 
                 reader.close();
             }
@@ -195,7 +207,7 @@ public class TimerStorage {
 
     private static File getFile(MinecraftServer server) {
         File worldDir = server.getSavePath(WorldSavePath.ROOT).toFile();
-        return new File(worldDir, FILE_NAME);
+        return new File(worldDir, fileName);
     }
 
     public static void save(MinecraftServer server) {
@@ -205,10 +217,10 @@ public class TimerStorage {
             FileWriter writer = new FileWriter(file);
 
             JsonObject obj = new JsonObject();
-            obj.add("timers", GSON.toJsonTree(timers));
-            obj.add("settings", GSON.toJsonTree(settings));
+            obj.add("timers", gson.toJsonTree(timers));
+            obj.add("settings", gson.toJsonTree(settings));
 
-            GSON.toJson(obj, writer);
+            gson.toJson(obj, writer);
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();

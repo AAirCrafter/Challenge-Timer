@@ -11,7 +11,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +20,11 @@ import java.util.stream.Collectors;
 public class Commands {
 
     public static Boolean toggleEndisableTimer = true;
-    public static Boolean toggleTimerPause = true;
 
     public static void registerCommands() {
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
             dispatcher.register(CommandManager.literal("timer")
-                    .requires(source -> source.hasPermissionLevel(3))
+                    //.requires(source -> source.hasPermissionLevel(1))
                     .executes(Commands::timer)
                     .then(CommandManager.literal("add")
                             .then(CommandManager.argument("name", StringArgumentType.string())
@@ -53,8 +51,7 @@ public class Commands {
                     )
                     .then(CommandManager.literal("en/disable")
                             .executes(context -> {
-                                toggleEndisableTimer = !toggleEndisableTimer;
-                                if (toggleEndisableTimer) {
+                                if (TimerStorage.toggleTimersEnabled(context.getSource().getServer())) {
                                     context.getSource().sendFeedback(() -> Text.literal("Timer's enabled!").formatted(Formatting.GOLD), true);
                                 } else {
                                     context.getSource().sendFeedback(() -> Text.literal("Timer's disabled!").formatted(Formatting.GOLD), true);
@@ -62,7 +59,7 @@ public class Commands {
                                 return 1;
                             }))
                     .then(CommandManager.literal("settings")
-                            .then(CommandManager.literal("defaultPrefix")
+                            .then(CommandManager.literal("prefix")
                                     .then(CommandManager.argument("value", StringArgumentType.string())
                                             .executes(context -> {
                                                 String prefix = StringArgumentType.getString(context, "value");
@@ -72,8 +69,8 @@ public class Commands {
                                             })
                                     )
                             )
-                            .then(CommandManager.literal("defaultSuffix")
-                                    .then(CommandManager.argument("value", StringArgumentType.string()) // nur mit Anführungszeichen!
+                            .then(CommandManager.literal("suffix")
+                                    .then(CommandManager.argument("value", StringArgumentType.string())
                                             .executes(context -> {
                                                 String suffix = StringArgumentType.getString(context, "value");
                                                 TimerStorage.setDefaultSuffix(context.getSource().getServer(), suffix);
@@ -85,21 +82,40 @@ public class Commands {
                             .then(CommandManager.literal("defaultColor")
                                     .then(CommandManager.argument("color", StringArgumentType.string())
                                             .suggests((context, builder) -> {
-                                                for (String color : Types.getColorNames()) {
+                                                for (String color : Renderer.getColorNames()) {
                                                     builder.suggest(color);
                                                 }
                                                 return builder.buildFuture();
                                             })
                                             .executes(Commands::setDefaultColor)
                                     )
+                                    .then(CommandManager.literal("useTimerFormattings")
+                                            .executes(context -> {
+                                                context.getSource().sendFeedback(() ->
+                                                        Text.literal((TimerStorage.toggleUseTimerFormattings(context.getSource().getServer()) ?
+                                                                "Pre/Suffix now uses Timer Formattings" : "Pre/Suffix no longer uses Timer Formattings"))
+                                                                .formatted(Formatting.GREEN),true);
+                                                return 1;
+                                            })
+                                    )
                             )
                             .then(CommandManager.literal("finishedText")
                                     .then(CommandManager.argument("value", StringArgumentType.string())
                                             .suggests((context,builder) -> {
-                                                builder.suggest("{name} over");
+                                                builder.suggest("\"{name} over\"");
                                                 return builder.buildFuture();
                                             })
-                                            .executes(Commands::setFinishedText))
+                                            .executes(Commands::setFinishedText)
+                                    )
+                            )
+                            .then(CommandManager.literal("pausedText")
+                                    .then(CommandManager.argument("value", StringArgumentType.string())
+                                            .suggests((context, builder) -> {
+                                                builder.suggest("\"{name} paused - {time}\"");
+                                                return builder.buildFuture();
+                                            })
+                                            .executes(Commands::setPausedText)
+                                    )
                             )
                             .then(CommandManager.literal("animationSpeed")
                                     .then(CommandManager.argument("animspeed", IntegerArgumentType.integer())
@@ -118,7 +134,7 @@ public class Commands {
                                     .then(CommandManager.literal("color")
                                             .then(CommandManager.argument("color",StringArgumentType.string())
                                                     .suggests((context,builder) -> {
-                                                        for (String color : Types.getColorNames()) {
+                                                        for (String color : Renderer.getColorNames()) {
                                                             builder.suggest(color);
                                                         }
                                                         return builder.buildFuture();
@@ -139,7 +155,7 @@ public class Commands {
                                     .then(CommandManager.literal("formattings")
                                             .then(CommandManager.argument("formatting", StringArgumentType.string())
                                                     .suggests((context, builder) -> {
-                                                        for (String formatting : Types.getFormattingNames()) {
+                                                        for (String formatting : Renderer.getFormattingNames()) {
                                                             builder.suggest(formatting);
                                                         }
                                                         return builder.buildFuture();
@@ -147,13 +163,6 @@ public class Commands {
                                                     .executes(Commands::setFormattings)
                                             )
                                     )
-                                    /*
-                                    .then(CommandManager.literal("prefix")
-                                            .then(CommandManager.argument("prefix",StringArgumentType.string())
-                                                    .executes()))
-                                    .then(CommandManager.literal("suffix")
-                                            .then(CommandManager.argument("suffix",StringArgumentType.string())
-                                                    .executes()))*/
                                     .then(CommandManager.literal("time")
                                             .then(CommandManager.argument("time",StringArgumentType.string())
                                                     .executes(Commands::setTime)
@@ -169,11 +178,11 @@ public class Commands {
                     )
                     .then(CommandManager.literal("pause")
                             .executes(context -> {
-                                toggleTimerPause = !toggleTimerPause;
-                                if (toggleTimerPause) {
-                                    context.getSource().sendFeedback(() -> Text.literal("Timer's unpaused!").formatted(Formatting.GOLD), true);
-                                } else {
+                                //toggleTimerPause = !toggleTimerPause;
+                                if (TimerStorage.toggleTimersPaused(context.getSource().getServer())) {
                                     context.getSource().sendFeedback(() -> Text.literal("Timer's paused!").formatted(Formatting.GOLD), true);
+                                } else {
+                                    context.getSource().sendFeedback(() -> Text.literal("Timer's unpaused!").formatted(Formatting.GOLD), true);
                                 }
                                 return 1;
                             }))
@@ -209,7 +218,7 @@ public class Commands {
 
         if (time >= -100 && time <= 100 && time != 0) {
             TimerStorage.setAnimationTime(server,time);
-            context.getSource().sendFeedback(() -> Text.literal("Set time to "+time).formatted(Formatting.GREEN),false);
+            context.getSource().sendFeedback(() -> Text.literal("Set AnimationTime to "+time).formatted(Formatting.GREEN),false);
         } else if (time == 0) {
             context.getSource().sendFeedback(() -> Text.literal("Please choose a static animation instad of typing 0").formatted(Formatting.RED),false);
         } else {
@@ -277,7 +286,7 @@ public class Commands {
             return 0;
         }
 
-        Text nameTextGradient = Types.generateGradientText(name,color1,color2);
+        Text nameTextGradient = Renderer.generateGradientText(name,color1,color2);
 
         if (optional2.isPresent()) {
             nameText = Text.literal(name).setStyle(Style.EMPTY.withColor(optional.get()));
@@ -288,7 +297,7 @@ public class Commands {
         }
 
         if (colorset) {
-            Text fullText = Text.literal("Recolored ").append(nameTextGradient).append(Text.literal("§r"));
+            Text fullText = Text.literal("Recolored ").append(nameTextGradient);
             context.getSource().sendFeedback(() -> fullText, false);
         }
 
@@ -353,7 +362,7 @@ public class Commands {
             return 0;
         }
 
-        Text nameTextGradient = Types.generateGradientText(name,color1,color2);
+        Text nameTextGradient = Renderer.generateGradientText(name,color1,color2);
 
         if (optional2.isPresent()) {
             nameText = Text.literal(name).setStyle(Style.EMPTY.withColor(optional.get()));
@@ -364,7 +373,7 @@ public class Commands {
         }
 
         if (colorset) {
-            Text fullText = Text.literal("Recolored ").append(nameTextGradient).append(Text.literal("§r"));
+            Text fullText = Text.literal("Recolored ").append(nameTextGradient);
             context.getSource().sendFeedback(() -> fullText, false);
         }
 
@@ -382,9 +391,11 @@ public class Commands {
                 .append(Text.literal("▶ /timer start exampletimer\n").formatted(Formatting.GRAY))
                 .append(Text.literal("\nHow to change the shown timer:\n").formatted(Formatting.WHITE))
                 .append(Text.literal("▶ /timer set othertimer\n").formatted(Formatting.GRAY))
-                .append(Text.literal("\nHow to change the timer's defaultPrefix:\n").formatted(Formatting.WHITE))
-                .append(Text.literal("▶ /timer settings defaultPrefix '>> '\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to change the timer's Prefix:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer settings prefix \">> \"\n").formatted(Formatting.GRAY))
                 .append(Text.literal("▶▶ the defaultPrefix&defaultSuffix color is the default color\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to merge prefix formattings with timer formattings :\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer settings defaultColor useTimerFormattings\">> \"\n").formatted(Formatting.GRAY))
                 .append(Text.literal("\nHow to set the color of a timer:\n").formatted(Formatting.WHITE))
                 .append(Text.literal("▶ /timer set exampletimer color aqua\n").formatted(Formatting.GRAY))
                 .append(Text.literal("▶▶ you can use hex codes by typing the code in quotation marks fe: '#FFFFFF'\n").formatted(Formatting.GRAY))
@@ -392,13 +403,16 @@ public class Commands {
                 .append(Text.literal("▶ /timer set exampletimer time 1h30m\n").formatted(Formatting.GRAY))
                 .append(Text.literal("▶▶ time is given like '1d6h20m12s'. timekeywords like h = hours, etc.\n").formatted(Formatting.GRAY))
                 .append(Text.literal("\nHow to modify the text shown when the timer is over:\n").formatted(Formatting.WHITE))
-                .append(Text.literal("▶ /timer settings finished_text '{name} is over stop doing sth'\n").formatted(Formatting.GRAY))
-                .append(Text.literal("▶▶ use {name} to use the timer's name in the finished_text\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶ /timer settings finishedText \"{name} is over stop doing sthẞ\"\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶▶ use {name} for the timer's name in the finished_text\n").formatted(Formatting.GRAY))
+                .append(Text.literal("\nHow to modify the text shown when the timer is paused:\n").formatted(Formatting.WHITE))
+                .append(Text.literal("▶ /timer settings pausedText \"{name} is paused - {time}\"\n").formatted(Formatting.GRAY))
+                .append(Text.literal("▶▶ {name} is the timer's name, {time} is the timer's time\n").formatted(Formatting.GRAY))
                 ;
 
         Text link = Text.literal("\n▶ Click here for more Information")
                 .formatted(Formatting.GOLD)
-                .styled(style -> style.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://github.com/AAirCrafter/Challenge-Timer"))));
+                .styled(style -> style.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://modrinth.com/mod/challengetimer"))));
 
         context.getSource().sendMessage(Text.empty().append(header).append(tutorial).append(link));
         return 1;
@@ -409,6 +423,7 @@ public class Commands {
         String name = StringArgumentType.getString(context, "name");
         MinecraftServer server = context.getSource().getServer();
         TimerStorage.startTimer(server,name);
+        context.getSource().sendFeedback(() -> Text.literal("Started "+name),false);
         return 1;
     }
 
@@ -416,7 +431,7 @@ public class Commands {
     private static int setColor(CommandContext<ServerCommandSource> context) {
         String color = StringArgumentType.getString(context, "color").toLowerCase();
         String name = StringArgumentType.getString(context, "name");
-        Map<String, Formatting> colorMap = Types.getColorMap();
+        Map<String, Formatting> colorMap = Renderer.getColorMap();
         MinecraftServer server = context.getSource().getServer();
 
         boolean exists = TimerStorage.getTimers().stream()
@@ -496,7 +511,7 @@ public class Commands {
         if (!exists) {
             context.getSource().sendFeedback(() -> Text.literal("Timer not found!").formatted(Formatting.RED),false);
         } else {
-            if (Types.getFormattingNames().contains(formatting)) {
+            if (Renderer.getFormattingNames().contains(formatting)) {
                 boolean enabled =  TimerStorage.setFormattings(server,name,formatting);
                 context.getSource().sendFeedback(() -> Text.literal((enabled? "En" : "Dis") + "abled formatting for "+name+": "+formatting).formatted(Formatting.GREEN),false);
             } else {
@@ -511,8 +526,16 @@ public class Commands {
     private static int setFinishedText(CommandContext<ServerCommandSource> context) {
         String text = StringArgumentType.getString(context,"value");
         MinecraftServer server = context.getSource().getServer();
-        TimerStorage.setFinishedMessage(server,text);
+        TimerStorage.setFinishedText(server,text);
         context.getSource().sendFeedback(() -> Text.literal("Finished Text set to: "+text).formatted(Formatting.GREEN),false);
+        return 1;
+    }
+
+    private static int setPausedText(CommandContext<ServerCommandSource> context) {
+        String text = StringArgumentType.getString(context,"value");
+        MinecraftServer server = context.getSource().getServer();
+        TimerStorage.setPausedText(server,text);
+        context.getSource().sendFeedback(() -> Text.literal("Paused Text set to: "+text).formatted(Formatting.GREEN),false);
         return 1;
     }
 
@@ -590,7 +613,7 @@ public class Commands {
 
     private static int setDefaultColor(CommandContext<ServerCommandSource> context) {
         String color = StringArgumentType.getString(context, "color").toLowerCase();
-        Map<String, Formatting> colorMap = Types.getColorMap();
+        Map<String, Formatting> colorMap = Renderer.getColorMap();
         MinecraftServer server = context.getSource().getServer();
 
         boolean isColorValid = false;
@@ -626,8 +649,8 @@ public class Commands {
         Text nameText = Text.literal(color).setStyle(Style.EMPTY.withColor(textColor));
 
         if (colorset) {
-            Text fullText = Text.literal("Recolored ").append(nameText);
-            context.getSource().sendFeedback(() -> fullText, false);
+            Text fullText = Text.literal("Set default color to ").append(nameText);
+            context.getSource().sendFeedback(() -> fullText, true);
         }
 
         return 1;
@@ -736,9 +759,6 @@ public class Commands {
         Text combined = Text.empty()
                 .append(existingtimerstxt)
                 .append(existingtimers);
-
-
-
 
         context.getSource().sendFeedback(() ->combined, false);
         return 1;

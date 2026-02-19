@@ -1,53 +1,52 @@
 {
-	"schemaVersion": 1,
-	"id": "timer",
-	"version": "1.2.5",
-	"name": "Timer",
-	"description": "an advanced countdown/stopwatch mod for challenges etc with all kinds of features such as animated gradients",
-	"custom": {
-		"modmenu": {
-			"links": {
-				"modmenu.discord": "https://www.aaircrafter.online/discord\"",
-				"modmenu.source": "https://github.com/AAirCrafter/Challenge-Timer",
-				"modmenu.modrinth": "https://modrinth.com/mod/challengetimer",
-				"PlanetMC": "https://www.planetminecraft.com/mod/challenge-timer-fabric/",
-				"modmenu.youtube": "https://www.youtube.com/@aaircrafter"
-			},
-			"update_checker": true
-		}
-	},
-	"authors": [
-		"AAirCrafter"
-	],
-	"contact": {
-		"homepage": "https://www.aaircrafter.online",
-		"issues": "https://github.com/AAirCrafter/Challenge-Timer/issues"
-	},
-	"license": "All rights reserved",
-	"icon": "assets/timer/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"air.dev.Timer"
-		],
-		"client": [
-			"air.dev.TimerClient"
-		]
-	},
-	"mixins": [
-		"timer.mixins.json",
-		{
-			"config": "timer.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.5",
-		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "timer",
+  "version": "${version}",
+  "name": "timer",
+  "description": "an advanced ingame timer for challenges etc",
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://www.aaircrafter.online/discord\"",
+        "modmenu.source": "https://github.com/AAirCrafter/Challenge-Timer",
+        "modmenu.modrinth": "https://modrinth.com/mod/challengetimer",
+        "PlanetMC": "https://www.planetminecraft.com/mod/challenge-timer-fabric/",
+        "modmenu.youtube": "https://www.youtube.com/@aaircrafter"
+      },
+      "update_checker": true
+    }
+  },
+  "authors": [
+    "AAirCrafter"
+  ],
+  "contact": {
+    "homepage": "https://www.aaircrafter.online",
+    "issues": "https://github.com/AAirCrafter/Challenge-Timer/issues"
+  },
+  "license": "All rights reserved",
+  "icon": "assets/timer/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "air.timer.client.TimerDataGenerator"
+    ],
+    "client": [
+      "air.timer.client.TimerClient"
+    ],
+    "main": [
+      "air.timer.Timer"
+    ]
+  },
+  "mixins": [
+    "timer.mixins.json",
+    {
+      "config": "timer.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
 }
